@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b10">
+  <title>MahfouzHub | Java Playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b10;
+      --panel: rgba(17, 20, 28, 0.88);
+      --panel-strong: #11141c;
+      --line: rgba(180, 193, 220, 0.12);
+      --muted: #7e8799;
+      --text: #edf1f8;
+      --cyan: #53d9ef;
+      --purple: #a38bff;
+      --green: #a7f279;
+      --red: #ff7587;
+      --mono: "DM Mono", "SFMono-Regular", Consolas, monospace;
+      --sans: "Manrope", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--bg); }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--text);
+      background: radial-gradient(ellipse at 48% -22%, rgba(85, 77, 148, 0.19), transparent 50%), var(--bg);
+      font-family: var(--sans);
+    }
+    button, textarea { font: inherit; }
+    button { color: inherit; }
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: .64;
+    }
+    .ambient-grid {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(160, 177, 210, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(160, 177, 210, .025) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
+    }
+    .shell { width: min(1440px, 100%); margin: 0 auto; padding: 0 44px 44px; }
+    .topbar {
+      height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      animation: reveal .65s both;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+    .brand-mark {
+      display: grid;
+      width: 35px;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid rgba(83, 217, 239, .42);
+      border-radius: 10px;
+      background: linear-gradient(145deg, rgba(83, 217, 239, .14), rgba(163, 139, 255, .15));
+      color: var(--cyan);
+      font: 500 16px var(--mono);
+      box-shadow: 0 0 24px rgba(83, 217, 239, .12), inset 0 0 16px rgba(163, 139, 255, .08);
+    }
+    .brand-name { font-size: 15px; font-weight: 800; letter-spacing: .1px; }
+    .brand-name span { color: var(--cyan); }
+    .top-meta { display: flex; align-items: center; gap: 20px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; }
+    .online { display: inline-flex; align-items: center; gap: 8px; }
+    .online::before { width: 7px; height: 7px; content: ""; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px rgba(167, 242, 121, .9); }
+    .top-divider { width: 1px; height: 18px; background: var(--line); }
+
+    .intro { padding: 45px 0 29px; animation: reveal .65s .08s both; }
+    .eyebrow { display: flex; align-items: center; gap: 9px; color: var(--cyan); font: 500 10px var(--mono); letter-spacing: 1.65px; text-transform: uppercase; }
+    .eyebrow-mark { width: 17px; height: 1px; background: currentColor; box-shadow: 0 0 8px currentColor; }
+    h1 { margin: 13px 0 8px; font-size: clamp(28px, 3vw, 39px); line-height: 1.16; letter-spacing: -.8px; font-weight: 700; }
+    h1 em { color: var(--purple); font-style: normal; }
+    .intro-copy { margin: 0; color: #969fb0; font-size: 13px; line-height: 1.7; }
+
+    .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 20px; align-items: start; }
+    .main-column, .tips-column { min-width: 0; animation: reveal .7s .16s both; }
+    .tips-column { animation-delay: .25s; }
+    .panel { overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); box-shadow: 0 18px 55px rgba(0, 0, 0, .19); backdrop-filter: blur(15px); }
+    .editor-panel { margin-bottom: 15px; }
+    .panel-head { min-height: 51px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 17px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.012); }
+    .file-label { display: flex; align-items: center; gap: 9px; color: #c9d0df; font: 12px var(--mono); }
+    .java-badge { display: grid; width: 19px; height: 19px; place-items: center; border: 1px solid rgba(163,139,255,.35); border-radius: 5px; color: #beaaff; font: 700 9px var(--sans); }
+    .file-status { color: #667184; font: 10px var(--mono); }
+    .editor-frame { display: grid; grid-template-columns: 49px minmax(0, 1fr); min-height: 282px; padding: 20px 18px 20px 0; background: linear-gradient(100deg, rgba(6,8,12,.32), transparent 14%); }
+    .line-numbers { overflow: hidden; padding-right: 14px; color: #505969; text-align: right; user-select: none; white-space: pre; font: 12px/24px var(--mono); }
+    .code-wrap { position: relative; min-width: 0; overflow: hidden; }
+    .code-highlight, #code-input {
+      width: 100%; min-height: 240px; margin: 0; padding: 0; border: 0; outline: 0; white-space: pre; tab-size: 4;
+      font: 12px/24px var(--mono); letter-spacing: 0; overflow: auto;
+    }
+    .code-highlight { position: absolute; inset: 0; pointer-events: none; color: #cbd4e2; }
+    #code-input { position: relative; display: block; resize: vertical; color: transparent; caret-color: #fff; background: transparent; -webkit-text-fill-color: transparent; }
+    #code-input::selection { background: rgba(83, 217, 239, .24); -webkit-text-fill-color: transparent; }
+    .token-keyword { color: #c4a8ff; }
+    .token-type { color: #65d9e8; }
+    .token-string { color: #b6e58e; }
+    .token-method { color: #f1c778; }
+    .token-comment { color: #697486; font-style: italic; }
+    .editor-foot { min-height: 37px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-top: 1px solid var(--line); color: #697487; font: 10px var(--mono); }
+    .editor-foot span:last-child { color: #8290a4; }
+    .actions { display: flex; align-items: center; gap: 14px; margin-top: 15px; }
+    .run-button {
+      min-width: 176px; height: 45px; display: inline-flex; align-items: center; justify-content: center; gap: 11px;
+      padding: 0 22px; border: 1px solid rgba(167,242,121,.58); border-radius: 6px; color: #09100b;
+      background: var(--green); cursor: pointer; font-size: 11px; font-weight: 800; letter-spacing: 1px;
+      box-shadow: 0 0 22px rgba(167,242,121,.16); transition: transform .18s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .run-button:hover { transform: translateY(-2px); background: #baff8e; box-shadow: 0 0 30px rgba(167,242,121,.38), 0 8px 22px rgba(0,0,0,.28); }
+    .run-button:active { transform: translateY(0) scale(.98); }
+    .run-button:disabled { cursor: wait; opacity: .82; transform: none; }
+    .play-icon { width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid currentColor; }
+    .run-spinner { display: none; width: 13px; height: 13px; border: 2px solid rgba(9,16,11,.28); border-top-color: #09100b; border-radius: 50%; animation: spin .65s linear infinite; }
+    .run-button.is-running .play-icon { display: none; }
+    .run-button.is-running .run-spinner { display: inline-block; }
+    .run-hint { color: #737e90; font: 10px var(--mono); }
+
+    .terminal-panel { min-height: 185px; }
+    .terminal-head { height: 45px; }
+    .terminal-title { display: flex; align-items: center; gap: 9px; color: #a9b2c1; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+    .terminal-symbol { color: var(--green); font: 13px var(--mono); }
+    .terminal-state { display: inline-flex; align-items: center; gap: 7px; color: #7c8798; font: 10px var(--mono); }
+    .state-dot { width: 6px; height: 6px; border-radius: 50%; background: #596375; }
+    .terminal-state.ready .state-dot { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .terminal-state.error .state-dot { background: var(--red); box-shadow: 0 0 8px var(--red); }
+    .terminal-body { min-height: 139px; padding: 15px 17px; color: #d4dbe7; font: 12px/1.9 var(--mono); }
+    .terminal-empty { color: #707b8d; }
+    .terminal-line { display: flex; gap: 11px; min-height: 23px; opacity: 0; animation: output-in .35s ease forwards; }
+    .terminal-prompt { color: var(--cyan); user-select: none; }
+    .terminal-error { color: var(--red); }
+    .terminal-success { color: #d9e6d2; }
+    .cursor { display: inline-block; width: 6px; height: 13px; margin-left: 2px; vertical-align: -2px; background: var(--green); animation: blink 1s steps(2, start) infinite; }
+
+    .tips-card { position: relative; min-height: 250px; padding: 19px; }
+    .tips-top { display: flex; align-items: center; justify-content: space-between; }
+    .tips-label { display: flex; align-items: center; gap: 8px; color: #b7a7ff; font: 500 10px var(--mono); letter-spacing: 1.3px; text-transform: uppercase; }
+    .bulb { color: #e7cc75; font-size: 14px; }
+    .tip-count { color: #697487; font: 10px var(--mono); }
+    .tip-content { padding: 25px 0 18px; transition: opacity .16s, transform .16s; }
+    .tip-content.switching { opacity: 0; transform: translateX(10px); }
+    .tip-number { color: rgba(163,139,255,.65); font: 11px var(--mono); }
+    .tip-content h2 { margin: 9px 0 9px; color: #edf0f8; font-size: 17px; line-height: 1.35; font-weight: 700; }
+    .tip-content p { margin: 0; color: #929caf; font-size: 11px; line-height: 1.8; }
+    .tip-code { margin-top: 15px; padding: 10px 11px; border-left: 2px solid rgba(83,217,239,.6); border-radius: 0 4px 4px 0; background: rgba(83,217,239,.055); color: #a9dbe0; font: 10px/1.7 var(--mono); overflow-wrap: anywhere; }
+    .tip-controls { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--line); }
+    .tip-progress { display: flex; gap: 5px; }
+    .tip-progress i { display: block; width: 13px; height: 3px; border-radius: 4px; background: #303746; transition: background .2s, width .2s; }
+    .tip-progress i.active { width: 22px; background: var(--purple); box-shadow: 0 0 9px rgba(163,139,255,.38); }
+    .next-tip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 0 6px 8px; border: 0; color: #d4c8ff; background: transparent; cursor: pointer; font-size: 10px; font-weight: 700; transition: color .18s; }
+    .next-tip:hover { color: white; }
+    .next-tip span { font-size: 15px; transition: transform .18s; }
+    .next-tip:hover span { transform: translateX(3px); }
+    .quick-card { margin-top: 13px; padding: 16px 17px; }
+    .quick-title { margin: 0 0 13px; color: #aab3c2; font-size: 10px; font-weight: 700; letter-spacing: .9px; text-transform: uppercase; }
+    .quick-item { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid rgba(180,193,220,.08); color: #8994a7; font-size: 10px; }
+    .quick-item strong { color: #bbc4d2; font: 10px var(--mono); }
+    .footer { display: flex; justify-content: space-between; gap: 20px; padding-top: 24px; color: #576173; font: 9px var(--mono); animation: reveal .7s .32s both; }
+    .footer b { color: #7e899b; font-weight: 400; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes blink { to { visibility: hidden; } }
+    @keyframes reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes output-in { to { opacity: 1; } }
+    @media (max-width: 900px) {
+      .shell { padding-right: 28px; padding-left: 28px; }
+      .workspace { grid-template-columns: minmax(0, 1fr) 250px; gap: 14px; }
+      .tips-card { padding: 16px; }
+    }
+    @media (max-width: 700px) {
+      .shell { padding: 0 18px 28px; }
+      .topbar { height: 68px; }
+      .top-meta { gap: 11px; font-size: 9px; }
+      .top-meta .edition { display: none; }
+      .intro { padding: 34px 0 22px; }
+      .workspace { grid-template-columns: 1fr; }
+      .tips-column { display: grid; grid-template-columns: minmax(0, 1fr) minmax(155px, .7fr); gap: 12px; }
+      .quick-card { margin-top: 0; align-self: stretch; }
+      .tips-card { min-height: 230px; }
+    }
+    @media (max-width: 480px) {
+      .shell { padding-right: 13px; padding-left: 13px; }
+      .brand { gap: 8px; }
+      .brand-mark { width: 32px; }
+      .brand-name { font-size: 13px; }
+      .top-meta { gap: 8px; font-size: 8px; letter-spacing: .4px; }
+      .top-divider { height: 14px; }
+      h1 { font-size: 29px; }
+      .intro-copy { max-width: 330px; font-size: 12px; }
+      .editor-frame { grid-template-columns: 38px minmax(0, 1fr); padding: 15px 10px 15px 0; }
+      .line-numbers { padding-right: 10px; font-size: 11px; }
+      .code-highlight, #code-input { font-size: 11px; }
+      .panel-head { padding-right: 12px; padding-left: 12px; }
+      .file-status { font-size: 9px; }
+      .actions { justify-content: space-between; gap: 8px; }
+      .run-button { min-width: 155px; height: 43px; padding: 0 15px; font-size: 10px; }
+      .run-hint { font-size: 9px; }
+      .tips-column { grid-template-columns: 1fr; }
+      .tips-card { min-height: unset; }
+      .quick-card { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; }
+      .quick-title { grid-column: 1 / -1; }
+      .quick-item { font-size: 9px; }
+      .quick-item strong { font-size: 9px; }
+      .footer { font-size: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles" aria-hidden="true"></canvas>
+  <div class="ambient-grid" aria-hidden="true"></div>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="MahfouzHub home">
+        <span class="brand-mark">M<span style="color:var(--purple)">/</span></span>
+        <span class="brand-name">Mahfouz<span>Hub</span></span>
+      </a>
+      <div class="top-meta">
+        <span class="edition">JAVA PLAYGROUND</span><span class="top-divider"></span><span class="online">SYSTEM ONLINE</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow"><span class="eyebrow-mark"></span> YOUR NEXT IDEA STARTS HERE</div>
+        <h1 id="page-title">Write code. <em>Make it run.</em></h1>
+        <p class="intro-copy">A little Java practice, right in your browser. No setup, just you and the code.</p>
+      </section>
+
+      <section class="workspace" aria-label="Java coding workspace">
+        <div class="main-column">
+          <section class="panel editor-panel" aria-label="Code editor">
+            <div class="panel-head">
+              <div class="file-label"><span class="java-badge">J</span><span>MahfouzHub.java</span></div>
+              <span class="file-status">JAVA&nbsp; / &nbsp;UTF-8</span>
+            </div>
+            <div class="editor-frame">
+              <div class="line-numbers" id="line-numbers" aria-hidden="true">1
+2
+3
+4
+5
+6</div>
+              <div class="code-wrap">
+                <pre class="code-highlight" id="code-highlight" aria-hidden="true"></pre>
+                <label class="sr-only" for="code-input">Java source code</label>
+                <textarea id="code-input" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-describedby="editor-help">public class MahfouzHub {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
+}</textarea>
+              </div>
+            </div>
+            <div class="editor-foot"><span id="editor-help">TIP: EDIT THE CODE, THEN RUN IT</span><span id="line-count">5 LINES</span></div>
+          </section>
+
+          <div class="actions">
+            <button class="run-button" id="run-button" type="button">
+              <span class="play-icon" aria-hidden="true"></span><span class="run-spinner" aria-hidden="true"></span><span id="run-label">RUN CODE</span>
+            </button>
+            <span class="run-hint">⌘ / CTRL + ENTER</span>
+          </div>
+
+          <section class="panel terminal-panel" aria-label="Program output">
+            <div class="panel-head terminal-head">
+              <div class="terminal-title"><span class="terminal-symbol">&gt;_</span> OUTPUT</div>
+              <span class="terminal-state" id="terminal-state"><i class="state-dot"></i><span id="state-label">IDLE</span></span>
+            </div>
+            <div class="terminal-body" id="terminal-body" aria-live="polite" aria-atomic="false">
+              <div class="terminal-empty">Your program output will appear here<span class="cursor"></span></div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="tips-column" aria-label="Java learning tips">
+          <section class="panel tips-card">
+            <div class="tips-top">
+              <div class="tips-label"><span class="bulb" aria-hidden="true">✳</span> PRO TIPS</div>
+              <span class="tip-count" id="tip-count">01 / 05</span>
+            </div>
+            <div class="tip-content" id="tip-content" aria-live="polite">
+              <div class="tip-number">TIP 01</div>
+              <h2>Every Java app starts somewhere.</h2>
+              <p>The <code>main</code> method is the entry point. The JVM looks here first when your program starts.</p>
+              <div class="tip-code">public static void main(String[] args)</div>
+            </div>
+            <div class="tip-controls">
+              <div class="tip-progress" id="tip-progress" aria-hidden="true"></div>
+              <button class="next-tip" id="next-tip" type="button" aria-label="Show next Java tip">NEXT TIP <span aria-hidden="true">→</span></button>
+            </div>
+          </section>
+
+          <section class="panel quick-card" aria-label="Workspace details">
+            <h2 class="quick-title">WORKSPACE</h2>
+            <div class="quick-item"><span>Language</span><strong>JAVA 17</strong></div>
+            <div class="quick-item"><span>Runtime</span><strong>SIMULATED</strong></div>
+            <div class="quick-item"><span>Setup</span><strong>NONE</strong></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="footer"><span>MADE FOR THE JOY OF <b>BUILDING</b></span><span>MAHFOUZHUB <b>·</b> JAVA PLAYGROUND</span></footer>
+  </div>
+
+  <script>
+    const editor = document.getElementById('code-input');
+    const highlight = document.getElementById('code-highlight');
+    const lineNumbers = document.getElementById('line-numbers');
+    const lineCount = document.getElementById('line-count');
+    const runButton = document.getElementById('run-button');
+    const terminal = document.getElementById('terminal-body');
+    const terminalState = document.getElementById('terminal-state');
+    const stateLabel = document.getElementById('state-label');
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+    }
+
+    function colorize(source) {
+      let safe = escapeHtml(source);
+      safe = safe.replace(/(&quot;(?:\\.|[^&])*?&quot;)/g, '<span class="token-string">$1</span>');
+      safe = safe.replace(/(\/\/.*)$/gm, '<span class="token-comment">$1</span>');
+      safe = safe.replace(/\b(public|private|protected|static|void|class|new|return|final)\b/g, '<span class="token-keyword">$1</span>');
+      safe = safe.replace(/\b(String|System|out|args)\b/g, '<span class="token-type">$1</span>');
+      safe = safe.replace(/\b(main|println|print)\b/g, '<span class="token-method">$1</span>');
+      return safe + (source.endsWith('\n') ? ' ' : '');
+    }
+
+    function syncEditor() {
+      const lines = editor.value.split('\n');
+      highlight.innerHTML = colorize(editor.value);
+      lineNumbers.textContent = lines.map((_, index) => index + 1).join('\n');
+      lineCount.textContent = `${lines.length} ${lines.length === 1 ? 'LINE' : 'LINES'}`;
+      highlight.scrollTop = editor.scrollTop;
+      highlight.scrollLeft = editor.scrollLeft;
+      lineNumbers.scrollTop = editor.scrollTop;
+    }
+
+    editor.addEventListener('input', syncEditor);
+    editor.addEventListener('scroll', syncEditor);
+    editor.addEventListener('keydown', event => {
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        editor.setRangeText('    ', start, end, 'end');
+        syncEditor();
+      }
+      if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) runCode();
+    });
+
+    function findSyntaxError(source) {
+      let quote = null;
+      let escaped = false;
+      let line = 1;
+      const stack = [];
+      const pairs = { ')': '(', ']': '[', '}': '{' };
+      for (const character of source) {
+        if (character === '\n') line++;
+        if (quote) {
+          if (escaped) escaped = false;
+          else if (character === '\\') escaped = true;
+          else if (character === quote) quote = null;
+          continue;
+        }
+        if (character === '"' || character === "'") { quote = character; continue; }
+        if ('([{'.includes(character)) stack.push({ character, line });
+        else if (')]}'.includes(character)) {
+          const open = stack.pop();
+          if (!open || open.character !== pairs[character]) {
+            return { line, message: `error: unmatched '${character}'` };
+          }
+        }
+      }
+      if (quote) return { line, message: 'error: unclosed string literal' };
+      if (stack.length) {
+        const open = stack[stack.length - 1];
+        const expected = { '(': ')', '[': ']', '{': '}' }[open.character];
+        return { line: source.split('\n').length, message: `error: reached end of file while parsing; expected '${expected}'` };
+      }
+      if (/System\s*\.\s*out\s*\.\s*printl\s*\(/.test(source)) {
+        const lineNumber = source.slice(0, source.search(/System\s*\.\s*out\s*\.\s*printl\s*\(/)).split('\n').length;
+        return { line: lineNumber, message: "error: cannot find symbol\n  symbol:   method printl(String)\n  location: variable out of type PrintStream" };
+      }
+      if (/System\s*\.\s*out\s*\.\s*println\s*\([^;]*\)\s*(?!;)/.test(source)) {
+        const match = source.match(/System\s*\.\s*out\s*\.\s*println\s*\([^;]*\)\s*(?!;)/);
+        const lineNumber = source.slice(0, source.indexOf(match[0])).split('\n').length;
+        return { line: lineNumber, message: "error: ';' expected" };
+      }
+      return null;
+    }
+
+    function showTerminal(lines, status) {
+      terminal.replaceChildren();
+      terminalState.className = `terminal-state ${status}`;
+      stateLabel.textContent = status === 'error' ? 'BUILD FAILED' : 'BUILD SUCCESS';
+      lines.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = `terminal-line ${item.error ? 'terminal-error' : 'terminal-success'}`;
+        row.style.animationDelay = `${index * 110}ms`;
+        const prompt = document.createElement('span');
+        prompt.className = 'terminal-prompt';
+        prompt.textContent = item.error ? '!' : '>';
+        const text = document.createElement('span');
+        text.textContent = item.text;
+        row.append(prompt, text);
+        terminal.append(row);
+      });
+      if (status === 'ready') {
+        const cursor = document.createElement('span');
+        cursor.className = 'cursor';
+        terminal.append(cursor);
+      }
+    }
+
+    function parseOutput(source) {
+      const output = [];
+      const expression = /System\s*\.\s*out\s*\.\s*println\s*\(\s*"((?:\\.|[^"\\])*)"\s*\)\s*;/g;
+      let match;
+      while ((match = expression.exec(source)) !== null) {
+        const value = match[1].replace(/\\("|\\|n|t|r)/g, (_, escaped) => ({ '"': '"', '\\': '\\', n: '\n', t: '\t', r: '\r' })[escaped]);
+        output.push(...value.split('\n').map(text => ({ text })));
+      }
+      if (output.length === 0) output.push({ text: 'Process finished with exit code 0' });
+      return output;
+    }
+
+    function runCode() {
+      if (runButton.disabled) return;
+      runButton.disabled = true;
+      runButton.classList.add('is-running');
+      document.getElementById('run-label').textContent = 'COMPILING...';
+      stateLabel.textContent = 'COMPILING';
+      terminalState.className = 'terminal-state';
+      terminal.replaceChildren();
+      const compiling = document.createElement('div');
+      compiling.className = 'terminal-line';
+      compiling.style.opacity = '1';
+      compiling.innerHTML = '<span class="terminal-prompt">&gt;</span><span>javac MahfouzHub.java</span>';
+      terminal.append(compiling);
+
+      window.setTimeout(() => {
+        const error = findSyntaxError(editor.value);
+        if (error) {
+          showTerminal([
+            { text: `MahfouzHub.java:${error.line}: ${error.message}`, error: true },
+            { text: '1 error', error: true }
+          ], 'error');
+        } else {
+          showTerminal([{ text: 'Build successful · 0.42s' }, ...parseOutput(editor.value)], 'ready');
+        }
+        runButton.disabled = false;
+        runButton.classList.remove('is-running');
+        document.getElementById('run-label').textContent = 'RUN CODE';
+      }, 850);
+    }
+
+    runButton.addEventListener('click', runCode);
+    syncEditor();
+
+    const tips = [
+      { title: 'Every Java app starts somewhere.', body: 'The <code>main</code> method is the entry point. The JVM looks here first when your program starts.', code: 'public static void main(String[] args)' },
+      { title: 'Braces keep your code together.', body: 'Every opening brace needs a closing one. Indentation makes those pairs much easier to spot.', code: 'class App {  // open\n}              // close' },
+      { title: 'Names are case-sensitive.', body: '<code>String</code> and <code>string</code> are different to Java. Types and class names start with capitals.', code: 'String greeting = "Hi!";' },
+      { title: 'Finish each statement with a semicolon.', body: 'Java uses semicolons to mark the end of a statement. Forget one and the compiler will let you know.', code: 'System.out.println("Ready");' },
+      { title: 'Print as often as you need.', body: '<code>println</code> adds a new line after each message. Try adding a second print statement in the editor.', code: 'System.out.println("Keep going!");' }
+    ];
+    let tipIndex = 0;
+    const tipContent = document.getElementById('tip-content');
+    const tipProgress = document.getElementById('tip-progress');
+    tips.forEach((_, index) => {
+      const mark = document.createElement('i');
+      if (index === 0) mark.className = 'active';
+      tipProgress.append(mark);
+    });
+    document.getElementById('next-tip').addEventListener('click', () => {
+      tipContent.classList.add('switching');
+      window.setTimeout(() => {
+        tipIndex = (tipIndex + 1) % tips.length;
+        const tip = tips[tipIndex];
+        tipContent.innerHTML = `<div class="tip-number">TIP ${String(tipIndex + 1).padStart(2, '0')}</div><h2>${tip.title}</h2><p>${tip.body}</p><div class="tip-code">${tip.code.replace(/\n/g, '<br>')}</div>`;
+        document.getElementById('tip-count').textContent = `${String(tipIndex + 1).padStart(2, '0')} / ${String(tips.length).padStart(2, '0')}`;
+        [...tipProgress.children].forEach((mark, index) => mark.classList.toggle('active', index === tipIndex));
+        tipContent.classList.remove('switching');
+      }, 170);
+    });
+
+    const canvas = document.getElementById('particles');
+    const context = canvas.getContext('2d');
+    let particles = [];
+    let frameId;
+    function resizeCanvas() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * ratio;
+      canvas.height = window.innerHeight * ratio;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      particles = Array.from({ length: Math.min(65, Math.floor(window.innerWidth / 20)) }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        radius: Math.random() * 1.2 + .3,
+        drift: (Math.random() - .5) * .18,
+        speed: Math.random() * .18 + .035,
+        alpha: Math.random() * .38 + .12
+      }));
+    }
+    function drawParticles() {
+      context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      for (const particle of particles) {
+        particle.y -= particle.speed;
+        particle.x += particle.drift;
+        if (particle.y < -4) { particle.y = window.innerHeight + 4; particle.x = Math.random() * window.innerWidth; }
+        if (particle.x < -4) particle.x = window.innerWidth + 4;
+        if (particle.x > window.innerWidth + 4) particle.x = -4;
+        context.beginPath();
+        context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        context.fillStyle = `rgba(138, 170, 220, ${particle.alpha})`;
+        context.fill();
+      }
+      frameId = window.requestAnimationFrame(drawParticles);
+    }
+    resizeCanvas();
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) drawParticles();
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('pagehide', () => window.cancelAnimationFrame(frameId));
+  </script>
+</body>
+</html>
